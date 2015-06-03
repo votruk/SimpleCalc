@@ -6,12 +6,16 @@ import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.MainFragment.operationType;
 
+
 /**
  * Created by KURT on 03.06.2015.
  */
 public class CalculationHistory {
+
 	private static CalculationHistory sCalculationHistory;
 	private Context mAppContext;
+
+	private MyFormatter mMyFormatter;
 
 	private ArrayList<String> mCalculations;
 
@@ -19,6 +23,7 @@ public class CalculationHistory {
 
 	private CalculationHistory(Context appContext) {
 		mAppContext = appContext;
+		mMyFormatter = MyFormatter.get();
 	}
 
 	public static CalculationHistory get(Context c) {
@@ -28,7 +33,10 @@ public class CalculationHistory {
 		return sCalculationHistory;
 	}
 
-	public void addLine(double firstOperand, operationType type, double secondOperand) {
+
+
+	public void addLine(double firstOperand, operationType type, double secondOperand, double result) {
+//		String newLine = String.format("s %s %s %s", )
 
 	}
 }

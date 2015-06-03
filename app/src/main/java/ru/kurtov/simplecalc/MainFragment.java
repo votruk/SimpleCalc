@@ -30,7 +30,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 	public enum operationType { DIVIDE, MULTIPLY, MINUS, PLUS, NOTHING }
 	private operationType mCurrentOperation;
 
-	private enum formatType { NORMAL, TWO_DECIMALS, ONE_DECIMAL }
+	public enum formatType { NORMAL, TWO_DECIMALS, ONE_DECIMAL }
 	private formatType mFormatType;
 
 	private Button mSquareButton;
@@ -61,6 +61,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
+		mFormatType = formatType.NORMAL;
+		MyFormatter.get().setFormatType(mFormatType);
 
 		clearAll();
 
@@ -73,9 +75,9 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				mCurrentNumber = mCurrentNumber * (-1);
-				MyFormatter mf = new MyFormatter();
+				MyFormatter mf = MyFormatter.get();
 
-				mNowTypingTextView.setText(mf.getFullDouble(mCurrentNumber, mPowerCount));
+				mNowTypingTextView.setText(mf.formatDouble(mCurrentNumber, mPowerCount));
 			}
 		});
 
@@ -139,14 +141,12 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mIsNew = false;
 
-		MyFormatter df = new MyFormatter();
+		MyFormatter mf = MyFormatter.get();
 		String currentNumberString = "";
-		if (mFormatType == formatType.NORMAL) {
-			currentNumberString = df.getFullDouble(mCurrentNumber, mPowerCount);
-		} else if (mFormatType == formatType.ONE_DECIMAL) {
-			currentNumberString = df.getOneDecimal(mCurrentNumber);
-		} else if (mFormatType == formatType.TWO_DECIMALS) {
-			currentNumberString = df.getTwoDecimals(mCurrentNumber);
+		if (mPowerCount > 0) {
+			currentNumberString = mf.formatDouble(mCurrentNumber, mPowerCount);
+		} else {
+			currentNumberString = mf.formatDouble(mCurrentNumber);
 		}
 
 		mNowTypingTextView.setText(currentNumberString);
@@ -159,7 +159,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mPowerCount = 0;
 		mPreviousNumber = 0;
 		mCurrentNumber = 0;
-		mFormatType = formatType.NORMAL;
+
+
 		mCurrentOperation = operationType.NOTHING;
 	}
 
@@ -168,25 +169,29 @@ public class MainFragment extends Fragment implements DigitClickable {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				MyFormatter df = new MyFormatter();
+				MyFormatter mf = MyFormatter.get();
 				if (mCurrentOperation == operationType.NOTHING) {
 					mPreviousNumber = mCurrentNumber;
 				} else {
 					if (mCurrentOperation == operationType.PLUS) {
-						mPreviousNumber = mPreviousNumber + mCurrentNumber;
+						mResult = mPreviousNumber + mCurrentNumber;
 					} else if (mCurrentOperation == operationType.MINUS) {
-						mPreviousNumber = mPreviousNumber - mCurrentNumber;
+						mResult = mPreviousNumber - mCurrentNumber;
 					} else if (mCurrentOperation == operationType.MULTIPLY) {
-						mPreviousNumber = mPreviousNumber * mCurrentNumber;
+						mResult = mPreviousNumber * mCurrentNumber;
 					} else if (mCurrentOperation == operationType.DIVIDE) {
-						mPreviousNumber = mPreviousNumber / mCurrentNumber;
+						mResult = mPreviousNumber / mCurrentNumber;
 					}
+
+					CalculationHistory.get(getActivity()).addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
 					String topString = String.format("%s %s = %s",
 							mHistoryTextView.getText(),
-							df.getFullDouble(mCurrentNumber, mPowerCount),
-							df.getFullDouble(mPreviousNumber));
-//					String newHistoryText = String.format("%s\n%s", mHistoryTextView.getText(), topString);
+							mf.formatDouble(mCurrentNumber, mPowerCount),
+							mf.formatDouble(mResult));
+
 					mHistoryTextView.setText(topString);
+					mPreviousNumber = mResult;
+
 
 				}
 				mCurrentOperation = type;
@@ -194,13 +199,13 @@ public class MainFragment extends Fragment implements DigitClickable {
 				String newHistoryText = "";
 				if (mHistoryTextView.getText().equals("")) {
 					newHistoryText = String.format("%s %s",
-							df.getFullDouble(mPreviousNumber),
-							df.getOperationToString(mCurrentOperation));
+							mf.formatDouble(mPreviousNumber),
+							mf.getOperationToString(mCurrentOperation));
 				} else {
 					newHistoryText = String.format("%s\n%s %s",
 							mHistoryTextView.getText(),
-							df.getFullDouble(mPreviousNumber),
-							df.getOperationToString(mCurrentOperation));
+							mf.formatDouble(mPreviousNumber),
+							mf.getOperationToString(mCurrentOperation));
 				}
 
 				mHistoryTextView.setText(newHistoryText);
