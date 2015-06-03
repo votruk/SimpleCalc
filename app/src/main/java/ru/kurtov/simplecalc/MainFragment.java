@@ -56,6 +56,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private TextView mNowTypingTextView;
 	private TextView mHistoryTextView;
 
+	private CalculationHistory mCalculationHistory;
+
 
 	@Nullable
 	@Override
@@ -63,6 +65,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
 		mFormatType = formatType.NORMAL;
 		MyFormatter.get().setFormatType(mFormatType);
+
+		mCalculationHistory = CalculationHistory.get(getActivity());
 
 		clearAll();
 
@@ -100,6 +104,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mDivideButton.setOnClickListener(operationAction(operationType.DIVIDE));
 		mMultiplyButton = (Button) v.findViewById(R.id.multiplyButton);
 		mMultiplyButton.setOnClickListener(operationAction(operationType.MULTIPLY));
+		mMultiplyButton.setText(Character.toString((char)215));
 		mMinusButton = (Button) v.findViewById(R.id.minusButton);
 		mMinusButton.setOnClickListener(operationAction(operationType.MINUS));
 		mPlusButton = (Button) v.findViewById(R.id.plusButton);
@@ -183,32 +188,37 @@ public class MainFragment extends Fragment implements DigitClickable {
 						mResult = mPreviousNumber / mCurrentNumber;
 					}
 
-					CalculationHistory.get(getActivity()).addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
-					String topString = String.format("%s %s = %s",
-							mHistoryTextView.getText(),
-							mf.formatDouble(mCurrentNumber),
-							mf.formatDouble(mResult));
+					CalculationHistory.get(getActivity()).addLine(mPreviousNumber,
+							mCurrentOperation, mCurrentNumber, mPowerCount, mResult);
+//					String topString = String.format("%s %s = %s",
+//							mHistoryTextView.getText(),
+//							mf.formatDouble(mCurrentNumber),
+//							mf.formatDouble(mResult));
 
-					mHistoryTextView.setText(topString);
+//					mHistoryTextView.setText(topString);
 					mPreviousNumber = mResult;
 
 
 				}
 				mCurrentOperation = type;
 				mPreviousPowerCount = mPowerCount;
-				String newHistoryText = "";
-				if (mHistoryTextView.getText().equals("")) {
-					newHistoryText = String.format("%s %s",
-							mf.formatDouble(mPreviousNumber),
-							mf.getOperationToString(mCurrentOperation));
-				} else {
-					newHistoryText = String.format("%s\n%s %s",
-							mHistoryTextView.getText(),
-							mf.formatDouble(mPreviousNumber),
-							mf.getOperationToString(mCurrentOperation));
-				}
+//				String newHistoryText = "";
+//				if (mHistoryTextView.getText().equals("")) {
+//					newHistoryText = String.format("%s %s",
+//							mf.formatDouble(mPreviousNumber),
+//							mf.getOperationToString(mCurrentOperation));
+//				} else {
+//					newHistoryText = String.format("%s\n%s %s",
+//							mHistoryTextView.getText(),
+//							mf.formatDouble(mPreviousNumber),
+//							mf.getOperationToString(mCurrentOperation));
+//				}
 
-				mHistoryTextView.setText(newHistoryText);
+				mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation);
+
+//				String testHistory = mCalculationHistory.getCalculationHistory();
+//				mHistoryTextView.setText(newHistoryText);
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 
 				mCurrentNumber = 0;
 				mIsDot = false;
@@ -216,7 +226,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mPowerCount = 0;
 
 				((Button) v).setTextColor(getResources().getColor(R.color.activeButtonTextColor));
-				if (mActiveButton != null) {
+				if (mActiveButton != null && mActiveButton !=  v) {
 					mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
 				}
 				mActiveButton = (Button) v;

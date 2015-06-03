@@ -49,8 +49,10 @@ public class MyFormatter {
 			if (d == (long) d) {
 				returnStatement = String.format("%s", (long) d);
 			} else {
-				String newDouble = BigDecimal.valueOf(d).toString();
-				returnStatement = String.format("%s", newDouble);
+//				String newDouble = BigDecimal.valueOf(d).toString();
+//				returnStatement = String.format("%s", newDouble);
+				DecimalFormat df = new DecimalFormat("#.#####");
+				returnStatement = df.format(d);
 			}
 		} else if (mFormatType == formatType.ONE_DECIMAL) {
 			DecimalFormat df = new DecimalFormat("#.#");

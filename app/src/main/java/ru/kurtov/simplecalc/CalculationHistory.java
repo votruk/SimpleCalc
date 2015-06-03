@@ -21,9 +21,13 @@ public class CalculationHistory {
 
 	private static final int MAX_LINES = 50;
 
+	private boolean isLastLineIncomplete;
+
 	private CalculationHistory(Context appContext) {
 		mAppContext = appContext;
 		mMyFormatter = MyFormatter.get();
+		mCalculations = new ArrayList<String>();
+		isLastLineIncomplete = false;
 	}
 
 	public static CalculationHistory get(Context c) {
@@ -35,14 +39,19 @@ public class CalculationHistory {
 
 
 
-	public void addLine(double firstOperand, operationType type, double secondOperand, double result) {
+	public void addLine(double firstOperand, operationType type, double secondOperand, int power, double result) {
 		String newLine = String.format("%s %s %s = %s",
 				mMyFormatter.formatDouble(firstOperand),
 				mMyFormatter.getOperationToString(type),
 				mMyFormatter.formatDouble(secondOperand),
 				mMyFormatter.formatDouble(result));
 
+		if (isLastLineIncomplete) {
+			int lastLineCount = mCalculations.size() - 1;
+			mCalculations.remove(lastLineCount);
+		}
 		mCalculations.add(newLine);
+		isLastLineIncomplete = false;
 	}
 
 	public void addLine(double firstOperand, operationType type) {
@@ -51,6 +60,7 @@ public class CalculationHistory {
 				mMyFormatter.getOperationToString(type));
 
 		mCalculations.add(newLine);
+		isLastLineIncomplete = true;
 	}
 
 	public String getCalculationHistory() {
@@ -58,7 +68,7 @@ public class CalculationHistory {
 		if (mCalculations.size() > 0) {
 			allLines = mCalculations.get(0);
 			for (int i = 1; i < mCalculations.size(); i++) {
-				allLines = String.format("\n%s", mCalculations.get(i));
+				allLines = allLines + String.format("\n%s", mCalculations.get(i));
 			}
 		}
 
