@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			 xmlns:tools="http://schemas.android.com/tools"
+			 android:layout_width="match_parent"
+			 android:layout_height="match_parent"
+			 android:stretchColumns="*">
+	<!--<ScrollView-->
+		<!--android:layout_height="120dp"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:paddingRight="16dp"-->
+		<!--android:paddingLeft="16dp"-->
+		<!--android:fillViewport="true">-->
+		<TextView android:id="@+id/historyTextView"
+				  android:height="120dp"
+			android:layout_width="fill_parent"
+			android:gravity="right|bottom"
+				  android:layout_gravity="right"
+				  tools:text="123 + 12"
+			android:maxLines="10"
+			android:scrollbars="vertical"
+			android:paddingLeft="16dp"
+			android:paddingRight="16dp"
+			android:paddingTop="16dp"/>
+	<!--</ScrollView>-->
+
+	<TextView android:id="@+id/nowTypingTextView"
+		android:gravity="right"
+		android:layout_height="48dp"
+		android:layout_width="match_parent"
+		android:textSize="24dp"
+		android:textStyle="bold"
+		android:paddingTop="8dp"
+		android:paddingRight="16dp"
+		android:paddingLeft="16dp"
+			  tools:text="125"/>
+
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+		style="@style/TableRow">
+		<Button	android:id="@+id/squareButton"
+			style="@style/ButtonSuperb"
+			android:text="SQR"/>
+		<Button android:id="@+id/percentButton"
+			style="@style/ButtonSuperb"
+			android:text="%"/>
+		<Button android:id="@+id/changeButton"
+			style="@style/ButtonSuperb"
+			android:text="+/-"/>
+		<Button android:id="@+id/backspaceButton"
+			style="@style/ButtonSuperb"
+			android:text="DEL"/>
+	</TableRow>
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+
+		style="@style/TableRow">
+		<Button android:id="@+id/memoryRecallClearButton"
+			style="@style/ButtonSuperb"
+			android:text="MRC"/>
+		<Button android:id="@+id/memoryAddButton"
+			style="@style/ButtonSuperb"
+			android:text="M+"/>
+		<Button android:id="@+id/memorySubtractButton"
+			style="@style/ButtonSuperb"
+			android:text="M-"/>
+		<Button android:id="@+id/clearButton"
+			style="@style/ButtonSuperb"
+			android:text="C"/>
+	</TableRow>
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+		style="@style/TableRow">
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="7"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="8"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="9"
+			android:onClick="digitClick"/>
+		<Button android:id="@+id/divideButton"
+			style="@style/ButtonSuperb"
+			android:text="/"/>
+	</TableRow>
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+		style="@style/TableRow">
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="4"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="5"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="6"
+			android:onClick="digitClick"/>
+		<Button android:id="@+id/multiplyButton"
+			style="@style/ButtonSuperb"
+			android:text="*"/>
+	</TableRow>
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+		style="@style/TableRow">
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="1"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="2"
+			android:onClick="digitClick"/>
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="3"
+			android:onClick="digitClick"/>
+		<Button android:id="@+id/minusButton"
+			style="@style/ButtonSuperb"
+			android:text="-"/>
+	</TableRow>
+	<View
+		android:layout_width="1dip"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal"
+		android:layout_centerHorizontal="true"/>
+	<TableRow
+		style="@style/TableRow">
+		<Button
+			style="@style/ButtonSuperb"
+			android:text="0"
+			android:onClick="digitClick"/>
+		<Button android:id="@+id/dotButton"
+			style="@style/ButtonSuperb"
+			android:text="."/>
+		<Button android:id="@+id/equalsButton"
+			style="@style/ButtonSuperb"
+			android:text="="/>
+		<Button android:id="@+id/plusButton"
+			style="@style/ButtonSuperb"
+			android:text="+"/>
+	</TableRow>
+
+</TableLayout>
