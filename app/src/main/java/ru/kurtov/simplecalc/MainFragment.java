@@ -186,7 +186,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 					CalculationHistory.get(getActivity()).addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
 					String topString = String.format("%s %s = %s",
 							mHistoryTextView.getText(),
-							mf.formatDouble(mCurrentNumber, mPowerCount),
+							mf.formatDouble(mCurrentNumber),
 							mf.formatDouble(mResult));
 
 					mHistoryTextView.setText(topString);

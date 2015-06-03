@@ -36,7 +36,32 @@ public class CalculationHistory {
 
 
 	public void addLine(double firstOperand, operationType type, double secondOperand, double result) {
-//		String newLine = String.format("s %s %s %s", )
+		String newLine = String.format("%s %s %s = %s",
+				mMyFormatter.formatDouble(firstOperand),
+				mMyFormatter.getOperationToString(type),
+				mMyFormatter.formatDouble(secondOperand),
+				mMyFormatter.formatDouble(result));
 
+		mCalculations.add(newLine);
+	}
+
+	public void addLine(double firstOperand, operationType type) {
+		String newLine = String.format("%s %s",
+				mMyFormatter.formatDouble(firstOperand),
+				mMyFormatter.getOperationToString(type));
+
+		mCalculations.add(newLine);
+	}
+
+	public String getCalculationHistory() {
+		String allLines = "";
+		if (mCalculations.size() > 0) {
+			allLines = mCalculations.get(0);
+			for (int i = 1; i < mCalculations.size(); i++) {
+				allLines = String.format("\n%s", mCalculations.get(i));
+			}
+		}
+
+		return allLines;
 	}
 }
