@@ -42,7 +42,7 @@ public class CalculationHistory {
 	public void addLine(double firstOperand, operationType type, double secondOperand, int power, double result) {
 		String newLine = String.format("%s %s %s = %s",
 				mMyFormatter.formatDouble(firstOperand),
-				mMyFormatter.getOperationToString(type),
+				mMyFormatter.getSymbolToString(type),
 				mMyFormatter.formatDouble(secondOperand),
 				mMyFormatter.formatDouble(result));
 
@@ -57,7 +57,7 @@ public class CalculationHistory {
 	public void addLine(double firstOperand, operationType type) {
 		String newLine = String.format("%s %s",
 				mMyFormatter.formatDouble(firstOperand),
-				mMyFormatter.getOperationToString(type));
+				mMyFormatter.getSymbolToString(type));
 
 		mCalculations.add(newLine);
 		isLastLineIncomplete = true;

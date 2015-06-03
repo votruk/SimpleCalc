@@ -27,10 +27,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private double mSecondOperand;
 	private double mResult;
 
-	public enum operationType { DIVIDE, MULTIPLY, MINUS, PLUS, NOTHING }
+	public enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING }
 	private operationType mCurrentOperation;
 
 	public enum formatType { NORMAL, TWO_DECIMALS, ONE_DECIMAL }
+	public enum specSymbol { SQUARE, PERCENT, PLUS_MINUS, BACKSPACE, EQUALS }
 	private formatType mFormatType;
 
 	private Button mSquareButton;
@@ -57,24 +58,32 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private TextView mHistoryTextView;
 
 	private CalculationHistory mCalculationHistory;
+	private MyFormatter mMyFormatter;
+
 
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
-		mFormatType = formatType.NORMAL;
-		MyFormatter.get().setFormatType(mFormatType);
+		mFormatType = formatType.ONE_DECIMAL;
+		mMyFormatter = MyFormatter.get();
+		mMyFormatter.setFormatType(mFormatType);
 
 		mCalculationHistory = CalculationHistory.get(getActivity());
 
 		clearAll();
 
 		mSquareButton = (Button) v.findViewById(R.id.squareButton);
+		mSquareButton.setText(mMyFormatter.getSymbolToString(specSymbol.SQUARE));
+
+
 		mPercentButton = (Button) v.findViewById(R.id.percentButton);
+		mPercentButton.setText(mMyFormatter.getSymbolToString(specSymbol.PERCENT));
+
+
 		mChangeButton = (Button) v.findViewById(R.id.changeButton);
-
-
+		mChangeButton.setText(mMyFormatter.getSymbolToString(specSymbol.PLUS_MINUS));
 		mChangeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -87,6 +96,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 
 		mBackspaceButton = (Button) v.findViewById(R.id.backspaceButton);
+		mBackspaceButton.setText(mMyFormatter.getSymbolToString(specSymbol.BACKSPACE));
+
 
 		mMemoryRecallClearButton = (Button) v.findViewById(R.id.memoryRecallClearButton);
 		mMemoryAddButton = (Button) v.findViewById(R.id.memoryAddButton);
@@ -101,16 +112,23 @@ public class MainFragment extends Fragment implements DigitClickable {
 		});
 
 		mDivideButton = (Button) v.findViewById(R.id.divideButton);
-		mDivideButton.setOnClickListener(operationAction(operationType.DIVIDE));
+		mDivideButton.setOnClickListener(operationAction(operationType.DIVISION));
+		mDivideButton.setText(mMyFormatter.getSymbolToString(operationType.DIVISION));
+
 		mMultiplyButton = (Button) v.findViewById(R.id.multiplyButton);
 		mMultiplyButton.setOnClickListener(operationAction(operationType.MULTIPLY));
-		mMultiplyButton.setText(Character.toString((char)215));
+		mMultiplyButton.setText(mMyFormatter.getSymbolToString(operationType.MULTIPLY));
+
 		mMinusButton = (Button) v.findViewById(R.id.minusButton);
 		mMinusButton.setOnClickListener(operationAction(operationType.MINUS));
+		mMinusButton.setText(mMyFormatter.getSymbolToString(operationType.MINUS));
+
 		mPlusButton = (Button) v.findViewById(R.id.plusButton);
 		mPlusButton.setOnClickListener(operationAction(operationType.PLUS));
+		mPlusButton.setText(mMyFormatter.getSymbolToString(operationType.PLUS));
 
 		mEqualsButton = (Button) v.findViewById(R.id.equalsButton);
+		mEqualsButton.setText(mMyFormatter.getSymbolToString(specSymbol.EQUALS));
 
 
 		mDotButton = (Button) v.findViewById(R.id.dotButton);
@@ -184,40 +202,20 @@ public class MainFragment extends Fragment implements DigitClickable {
 						mResult = mPreviousNumber - mCurrentNumber;
 					} else if (mCurrentOperation == operationType.MULTIPLY) {
 						mResult = mPreviousNumber * mCurrentNumber;
-					} else if (mCurrentOperation == operationType.DIVIDE) {
+					} else if (mCurrentOperation == operationType.DIVISION) {
 						mResult = mPreviousNumber / mCurrentNumber;
 					}
 
 					CalculationHistory.get(getActivity()).addLine(mPreviousNumber,
 							mCurrentOperation, mCurrentNumber, mPowerCount, mResult);
-//					String topString = String.format("%s %s = %s",
-//							mHistoryTextView.getText(),
-//							mf.formatDouble(mCurrentNumber),
-//							mf.formatDouble(mResult));
 
-//					mHistoryTextView.setText(topString);
 					mPreviousNumber = mResult;
-
-
 				}
 				mCurrentOperation = type;
 				mPreviousPowerCount = mPowerCount;
-//				String newHistoryText = "";
-//				if (mHistoryTextView.getText().equals("")) {
-//					newHistoryText = String.format("%s %s",
-//							mf.formatDouble(mPreviousNumber),
-//							mf.getOperationToString(mCurrentOperation));
-//				} else {
-//					newHistoryText = String.format("%s\n%s %s",
-//							mHistoryTextView.getText(),
-//							mf.formatDouble(mPreviousNumber),
-//							mf.getOperationToString(mCurrentOperation));
-//				}
 
 				mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation);
 
-//				String testHistory = mCalculationHistory.getCalculationHistory();
-//				mHistoryTextView.setText(newHistoryText);
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 
 				mCurrentNumber = 0;

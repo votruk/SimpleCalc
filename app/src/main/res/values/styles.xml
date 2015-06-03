@@ -8,20 +8,14 @@
 	<style name="ButtonSuperb" parent="Widget.AppCompat.Button.Borderless.Colored">
 		<item name="android:textColor">@color/defaultButtonTextColor</item>
 		<item name="android:layout_height">match_parent</item>
-
 		<item name="android:textSize">24dp</item>
 		<item name="android:layout_weight">1</item>
 
 	</style>
 
-	<style name="NormalButton">
-		<item name="android:background">#00ffffff</item>
-		<item name="android:textColor">@color/defaultButtonTextColor</item>
-		<item name="android:colorBackground">#00ffffff</item>
-		<item name="android:layout_height">match_parent</item>
-		<item name="android:layout_margin">1dp</item>
-		<item name="android:padding">4dp</item>
-		<item name="android:textAppearance">?android:textAppearanceLarge</item>
+
+	<style name="BigTextButton" parent="ButtonSuperb">
+		<item name="android:textSize">36dp</item>
 	</style>
 	
 	<style name="TableRow">

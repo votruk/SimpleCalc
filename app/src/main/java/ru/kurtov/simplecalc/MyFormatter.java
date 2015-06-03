@@ -1,28 +1,39 @@
 package ru.kurtov.simplecalc;
 
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import ru.kurtov.simplecalc.MainFragment.operationType;
 import ru.kurtov.simplecalc.MainFragment.formatType;
+import ru.kurtov.simplecalc.MainFragment.specSymbol;
 /**
  * Created by KURT on 02.06.2015.
  */
 public class MyFormatter {
-//	private enum operationType {DIVIDE, MULTIPLY, MINUS, PLUS, NOTHING};
+//	private enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING};
 
 	private formatType mFormatType;
-	private HashMap<operationType, String> operationToString;
+	private HashMap<operationType, String> mOperationTypeHashMap;
+	private static HashMap<specSymbol, String> mSpecSymbolsHashMap;
+
 	private static MyFormatter sMyFormatter;
 
 
 	private MyFormatter() {
-		operationToString = new HashMap<operationType, String>();
-		operationToString.put(operationType.PLUS, "+");
-		operationToString.put(operationType.MINUS, "-");
-		operationToString.put(operationType.DIVIDE, "/");
-		operationToString.put(operationType.MULTIPLY, "*");
+		mOperationTypeHashMap = new HashMap<operationType, String>();
+
+		mOperationTypeHashMap.put(operationType.DIVISION, Character.toString((char) 247));
+		mOperationTypeHashMap.put(operationType.MULTIPLY, Character.toString((char) 215));
+		mOperationTypeHashMap.put(operationType.PLUS, Character.toString((char) 43));
+		mOperationTypeHashMap.put(operationType.MINUS, Character.toString((char) 8722));
+
+
+		mSpecSymbolsHashMap = new HashMap<specSymbol, String>();
+		mSpecSymbolsHashMap.put(specSymbol.BACKSPACE, Character.toString((char) 8592));
+		mSpecSymbolsHashMap.put(specSymbol.PERCENT, Character.toString((char) 37));
+		mSpecSymbolsHashMap.put(specSymbol.PLUS_MINUS, Character.toString((char) 177));
+		mSpecSymbolsHashMap.put(specSymbol.SQUARE, Character.toString((char) 8730));
+		mSpecSymbolsHashMap.put(specSymbol.EQUALS, Character.toString((char) 61));
 	}
 
 	public static MyFormatter get() {
@@ -66,18 +77,11 @@ public class MyFormatter {
 
 	}
 
-//	public String getTwoDecimals(double d) {
-//		DecimalFormat df = new DecimalFormat("#.##");
-//		return df.format(d);
-//	}
-//
-//	public String getOneDecimal(double d) {
-//		DecimalFormat df = new DecimalFormat("#.#");
-//		return df.format(d);
-//	}
-
-	public String getOperationToString(operationType type) {
-		return operationToString.get(type);
+	public String getSymbolToString(operationType type) {
+		return mOperationTypeHashMap.get(type);
+	}
+	public String getSymbolToString(specSymbol symbol) {
+		return mSpecSymbolsHashMap.get(symbol);
 	}
 
 	public void setFormatType(formatType type) {
