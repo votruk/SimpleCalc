@@ -56,7 +56,10 @@ public class CalculationHistory {
 		String newLine = String.format("%s %s",
 				mMyFormatter.formatDouble(firstOperand),
 				mMyFormatter.getSymbolToString(type));
-
+		if (isLastLineIncomplete) {
+			int lastLineCount = mCalculations.size() - 1;
+			mCalculations.remove(lastLineCount);
+		}
 		mCalculations.add(newLine);
 		isLastLineIncomplete = true;
 	}
@@ -86,6 +89,15 @@ public class CalculationHistory {
 			int lastLineCount = mCalculations.size() - 1;
 			mCalculations.remove(lastLineCount);
 		}
+		mCalculations.add(newLine);
+		isLastLineIncomplete = false;
+	}
+
+	public void addLine(double onlyOneOperand) {
+		String newLine = String.format("%s = %s",
+				mMyFormatter.formatDouble(onlyOneOperand),
+				mMyFormatter.formatDouble(onlyOneOperand));
+
 		mCalculations.add(newLine);
 		isLastLineIncomplete = false;
 	}

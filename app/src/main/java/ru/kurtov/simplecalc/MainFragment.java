@@ -79,8 +79,13 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mSquareButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mCurrentNumber = Math.sqrt(mCurrentNumber);
+				if (mIsNew) {
+					mCurrentNumber = Math.sqrt(mResult);
+				} else {
+					mCurrentNumber = Math.sqrt(mCurrentNumber);
+				}
 				mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+				mPreviousNumber = mCurrentNumber;
 			}
 		});
 
@@ -137,6 +142,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				clearAll();
+				mNowTypingTextView.setText("");
 			}
 		});
 
@@ -167,7 +173,6 @@ public class MainFragment extends Fragment implements DigitClickable {
 						mResult = mCurrentNumber;
 					}
 					mCalculationHistory.addLine(mResult);
-
 
 				} else {
 					if (mCurrentOperation == operationType.PLUS) {
