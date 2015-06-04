@@ -5,11 +5,9 @@ import android.content.Context;
 import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.MainFragment.operationType;
+import ru.kurtov.simplecalc.MainFragment.specSymbol;
 
 
-/**
- * Created by KURT on 03.06.2015.
- */
 public class CalculationHistory {
 
 	private static CalculationHistory sCalculationHistory;
@@ -39,7 +37,7 @@ public class CalculationHistory {
 
 
 
-	public void addLine(double firstOperand, operationType type, double secondOperand, int power, double result) {
+	public void addLine(double firstOperand, operationType type, double secondOperand, double result) {
 		String newLine = String.format("%s %s %s = %s",
 				mMyFormatter.formatDouble(firstOperand),
 				mMyFormatter.getSymbolToString(type),
@@ -61,6 +59,35 @@ public class CalculationHistory {
 
 		mCalculations.add(newLine);
 		isLastLineIncomplete = true;
+	}
+
+	public void addLine(double firstOperand, operationType type, double secondOperand, double result, specSymbol symbol) {
+		String newLine = "";
+		if (symbol == specSymbol.PERCENT) {
+			if (type == operationType.PLUS || type == operationType.MINUS) {
+				newLine = String.format("%s %s %s%% = %s",
+						mMyFormatter.formatDouble(firstOperand),
+						mMyFormatter.getSymbolToString(type),
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
+			} else if (type == operationType.MULTIPLY || type == operationType.DIVISION) {
+				newLine = String.format("%s%% from %s = %s",
+						mMyFormatter.formatDouble(firstOperand),
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
+			} else if (type == operationType.NOTHING) {
+				newLine = String.format("%s%% = %s",
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
+			}
+		}
+
+		if (isLastLineIncomplete) {
+			int lastLineCount = mCalculations.size() - 1;
+			mCalculations.remove(lastLineCount);
+		}
+		mCalculations.add(newLine);
+		isLastLineIncomplete = false;
 	}
 
 	public String getCalculationHistory() {

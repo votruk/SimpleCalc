@@ -6,9 +6,7 @@ import java.util.HashMap;
 import ru.kurtov.simplecalc.MainFragment.operationType;
 import ru.kurtov.simplecalc.MainFragment.formatType;
 import ru.kurtov.simplecalc.MainFragment.specSymbol;
-/**
- * Created by KURT on 02.06.2015.
- */
+
 public class MyFormatter {
 //	private enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING};
 

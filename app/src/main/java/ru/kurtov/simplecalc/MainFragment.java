@@ -11,9 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-/**
- * Created by KURT on 01.06.2015.
- */
+
 public class MainFragment extends Fragment implements DigitClickable {
 
 	private double mCurrentNumber;
@@ -88,6 +86,28 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mPercentButton = (Button) v.findViewById(R.id.percentButton);
 		mPercentButton.setText(mMyFormatter.getSymbolToString(specSymbol.PERCENT));
+		mPercentButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mCurrentOperation == operationType.PLUS) {
+					mResult = mPreviousNumber * (1 + mCurrentNumber / 100);
+				} else if (mCurrentOperation == operationType.MINUS) {
+					mResult = mPreviousNumber * (1 - mCurrentNumber / 100);
+				} else if (mCurrentOperation == operationType.MULTIPLY || mCurrentOperation == operationType.DIVISION) {
+					mResult = (mPreviousNumber / 100) * mCurrentNumber;
+				} else if (mCurrentOperation == operationType.NOTHING) {
+					mResult = mCurrentNumber / 100;
+				}
+				mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult, specSymbol.PERCENT);
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mPreviousNumber = mResult;
+				mCurrentOperation = operationType.NOTHING;
+				mCurrentNumber = 0;
+				mIsDot = false;
+				mIsNew = true;
+				mPowerCount = 0;
+			}
+		});
 
 
 		mChangeButton = (Button) v.findViewById(R.id.changeButton);
@@ -202,9 +222,12 @@ public class MainFragment extends Fragment implements DigitClickable {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				MyFormatter mf = MyFormatter.get();
 				if (mCurrentOperation == operationType.NOTHING) {
-					mPreviousNumber = mCurrentNumber;
+					if (mCurrentNumber == 0 && mResult != 0) {
+						mPreviousNumber = mResult;
+					} else {
+						mPreviousNumber = mCurrentNumber;
+					}
 				} else {
 					if (mCurrentOperation == operationType.PLUS) {
 						mResult = mPreviousNumber + mCurrentNumber;
@@ -216,8 +239,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 						mResult = mPreviousNumber / mCurrentNumber;
 					}
 
-					CalculationHistory.get(getActivity()).addLine(mPreviousNumber,
-							mCurrentOperation, mCurrentNumber, mPowerCount, mResult);
+					mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
 
 					mPreviousNumber = mResult;
 				}
@@ -232,6 +254,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mIsDot = false;
 				mIsNew = true;
 				mPowerCount = 0;
+				mResult = 0;
 
 				((Button) v).setTextColor(getResources().getColor(R.color.activeButtonTextColor));
 				if (mActiveButton != null && mActiveButton !=  v) {
