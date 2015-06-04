@@ -1,5 +1,6 @@
 package ru.kurtov.simplecalc;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -66,7 +67,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
-		mFormatType = formatType.ONE_DECIMAL;
+		mFormatType = formatType.NORMAL;
 		mMyFormatter = MyFormatter.get();
 		mMyFormatter.setFormatType(mFormatType);
 
@@ -76,6 +77,13 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mSquareButton = (Button) v.findViewById(R.id.squareButton);
 		mSquareButton.setText(mMyFormatter.getSymbolToString(specSymbol.SQUARE));
+		mSquareButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mCurrentNumber = Math.sqrt(mCurrentNumber);
+				mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+			}
+		});
 
 
 		mPercentButton = (Button) v.findViewById(R.id.percentButton);
@@ -142,6 +150,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mNowTypingTextView = (TextView) v.findViewById(R.id.nowTypingTextView);
 		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
 		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
+//		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Koenigtype-reg.ttf");
+//		mHistoryTextView.setTypeface(tf);
 
 		return v;
 	}
