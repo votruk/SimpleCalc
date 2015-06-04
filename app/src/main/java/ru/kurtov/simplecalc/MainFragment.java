@@ -28,6 +28,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 	public enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING }
 	private operationType mCurrentOperation;
+	private operationType mPreviousOperation;
 
 	public enum formatType { NORMAL, TWO_DECIMALS, ONE_DECIMAL }
 	public enum specSymbol { SQUARE, PERCENT, PLUS_MINUS, BACKSPACE, EQUALS }
@@ -157,6 +158,38 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mEqualsButton = (Button) v.findViewById(R.id.equalsButton);
 		mEqualsButton.setText(mMyFormatter.getSymbolToString(specSymbol.EQUALS));
+		mEqualsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
+				if (mCurrentOperation == operationType.NOTHING) {
+					if (mCurrentNumber != 0 && mResult == 0) {
+						mResult = mCurrentNumber;
+					}
+					mCalculationHistory.addLine(mResult);
+
+
+				} else {
+					if (mCurrentOperation == operationType.PLUS) {
+						mResult = mPreviousNumber + mCurrentNumber;
+					} else if (mCurrentOperation == operationType.MINUS) {
+						mResult = mPreviousNumber - mCurrentNumber;
+					} else if (mCurrentOperation == operationType.MULTIPLY) {
+						mResult = mPreviousNumber * mCurrentNumber;
+					} else if (mCurrentOperation == operationType.DIVISION) {
+						mResult = mPreviousNumber / mCurrentNumber;
+					}
+
+					mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
+					mPreviousNumber = mResult;
+					mPowerCount = 0;
+				}
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mIsNew = true;
+				mIsDot = false;
+
+			}
+		});
 
 
 		mDotButton = (Button) v.findViewById(R.id.dotButton);
@@ -222,27 +255,29 @@ public class MainFragment extends Fragment implements DigitClickable {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mCurrentOperation == operationType.NOTHING) {
-					if (mCurrentNumber == 0 && mResult != 0) {
-						mPreviousNumber = mResult;
+				if (!mIsNew) {
+					if (mCurrentOperation == operationType.NOTHING) {
+						if (mCurrentNumber == 0 && mResult != 0) {
+							mPreviousNumber = mResult;
+						} else {
+							mPreviousNumber = mCurrentNumber;
+						}
 					} else {
-						mPreviousNumber = mCurrentNumber;
-					}
-				} else {
-					if (mCurrentOperation == operationType.PLUS) {
-						mResult = mPreviousNumber + mCurrentNumber;
-					} else if (mCurrentOperation == operationType.MINUS) {
-						mResult = mPreviousNumber - mCurrentNumber;
-					} else if (mCurrentOperation == operationType.MULTIPLY) {
-						mResult = mPreviousNumber * mCurrentNumber;
-					} else if (mCurrentOperation == operationType.DIVISION) {
-						mResult = mPreviousNumber / mCurrentNumber;
+						if (mCurrentOperation == operationType.PLUS) {
+							mResult = mPreviousNumber + mCurrentNumber;
+						} else if (mCurrentOperation == operationType.MINUS) {
+							mResult = mPreviousNumber - mCurrentNumber;
+						} else if (mCurrentOperation == operationType.MULTIPLY) {
+							mResult = mPreviousNumber * mCurrentNumber;
+						} else if (mCurrentOperation == operationType.DIVISION) {
+							mResult = mPreviousNumber / mCurrentNumber;
+						}
+						mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
+						mPreviousNumber = mResult;
 					}
 
-					mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
-
-					mPreviousNumber = mResult;
 				}
+
 				mCurrentOperation = type;
 				mPreviousPowerCount = mPowerCount;
 
@@ -250,14 +285,13 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 
-				mCurrentNumber = 0;
 				mIsDot = false;
 				mIsNew = true;
 				mPowerCount = 0;
 				mResult = 0;
 
 				((Button) v).setTextColor(getResources().getColor(R.color.activeButtonTextColor));
-				if (mActiveButton != null && mActiveButton !=  v) {
+				if (mActiveButton != null && mActiveButton != v) {
 					mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
 				}
 				mActiveButton = (Button) v;
