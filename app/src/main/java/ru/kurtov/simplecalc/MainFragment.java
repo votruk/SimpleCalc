@@ -35,6 +35,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 	private formatType mFormatType;
 
+
 	private Button mSquareButton;
 	private Button mPercentButton;
 	private Button mChangeButton;
@@ -57,6 +58,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 	private TextView mNowTypingTextView;
 	private TextView mHistoryTextView;
+	private TextView mMemoryTextView;
+
 
 	private CalculationHistory mCalculationHistory;
 	private MyFormatter mMyFormatter;
@@ -79,6 +82,9 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
 		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
+
+		mMemoryTextView = (TextView) v.findViewById(R.id.memoryTextView);
+		mMemoryTextView.setText("MEMORY: 0");
 
 		clearAll();
 
@@ -168,7 +174,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 			public void onClick(View v) {
 				if (mActiveButton == v) {
 					mResult = 0;
+					mMemory = 0;
 					mCalculationHistory.addLine(mResult, memoryOperation.CLEAR);
+					String memoryString = String.format("MEMORY: %s",
+							mMyFormatter.formatDouble(mMemory));
+					mMemoryTextView.setText(memoryString);
 				} else {
 					mCurrentNumber = mMemory;
 					mIsNew = true;
@@ -186,15 +196,19 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mIsNew) {
-					mMemory = mMemory - mResult;
+					mMemory = mMemory + mResult;
 					mCalculationHistory.addLine(mResult, memoryOperation.ADD);
 				} else {
-					mMemory = mMemory - mCurrentNumber;
+					mMemory = mMemory + mCurrentNumber;
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
 				}
+				String memoryString = String.format("MEMORY: %s",
+						mMyFormatter.formatDouble(mMemory));
+				mMemoryTextView.setText(memoryString);
 				mIsNew = true;
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mActiveButton = (Button) v;
+
 			}
 		});
 
@@ -209,6 +223,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mMemory = mMemory - mCurrentNumber;
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
 				}
+
+				String memoryString = String.format("MEMORY: %s",
+						mMyFormatter.formatDouble(mMemory));
+				mMemoryTextView.setText(memoryString);
+
 				mIsNew = true;
 				mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
