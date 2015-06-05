@@ -9,5 +9,5 @@ public class Enums {
 
 	public enum specSymbol { SQUARE, PERCENT, PLUS_MINUS, BACKSPACE, EQUALS }
 
-	public enum memoryOperations { ADD, SUBTRACT, RECALL, CLEAR }
+	public enum memoryOperation { ADD, SUBTRACT, RECALL, CLEAR }
 }

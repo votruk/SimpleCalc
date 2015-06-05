@@ -13,7 +13,7 @@ import android.widget.TextView;
 import ru.kurtov.simplecalc.Enums.formatType;
 import ru.kurtov.simplecalc.Enums.operationType;
 import ru.kurtov.simplecalc.Enums.specSymbol;
-import ru.kurtov.simplecalc.Enums.memoryOperations;
+import ru.kurtov.simplecalc.Enums.memoryOperation;
 
 
 public class MainFragment extends Fragment implements DigitClickable {
@@ -70,6 +70,12 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mCalculationHistory = CalculationHistory.get(getActivity());
 
+		mNowTypingTextView = (TextView) v.findViewById(R.id.nowTypingTextView);
+		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+
+		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
+		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
+
 		clearAll();
 
 		mSquareButton = (Button) v.findViewById(R.id.squareButton);
@@ -84,6 +90,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 				}
 				mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
 				mPreviousNumber = mCurrentNumber;
+
+				mActiveButton = (Button) v;
 			}
 		});
 
@@ -110,6 +118,9 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mIsDot = false;
 				mIsNew = true;
 				mPowerCount = 0;
+
+				mActiveButton = (Button) v;
+
 			}
 		});
 
@@ -123,6 +134,9 @@ public class MainFragment extends Fragment implements DigitClickable {
 				MyFormatter mf = MyFormatter.get();
 
 				mNowTypingTextView.setText(mf.formatDouble(mCurrentNumber, mPowerCount));
+
+				mActiveButton = (Button) v;
+
 			}
 		});
 
@@ -137,12 +151,16 @@ public class MainFragment extends Fragment implements DigitClickable {
 			public void onClick(View v) {
 				if (mActiveButton == v) {
 					mResult = 0;
+					mCalculationHistory.addLine(mResult, memoryOperation.CLEAR);
 				} else {
 					mCurrentNumber = mMemory;
 					mIsNew = true;
 					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
-					mActiveButton = (Button) v;
+					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.RECALL);
 				}
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mActiveButton = (Button) v;
+
 			}
 		});
 
@@ -150,8 +168,16 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mMemoryAddButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mMemory = mMemory + mCurrentNumber;
+				if (mIsNew) {
+					mMemory = mMemory - mResult;
+					mCalculationHistory.addLine(mResult, memoryOperation.ADD);
+				} else {
+					mMemory = mMemory - mCurrentNumber;
+					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+				}
 				mIsNew = true;
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mActiveButton = (Button) v;
 			}
 		});
 
@@ -159,8 +185,17 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mMemorySubtractButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mMemory = mMemory - mCurrentNumber;
+				if (mIsNew) {
+					mMemory = mMemory - mResult;
+					mCalculationHistory.addLine(mResult, memoryOperation.ADD);
+				} else {
+					mMemory = mMemory - mCurrentNumber;
+					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+				}
 				mIsNew = true;
+				mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mActiveButton = (Button) v;
 			}
 		});
 
@@ -170,6 +205,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 			public void onClick(View v) {
 				clearAll();
 				mNowTypingTextView.setText("");
+				mActiveButton = (Button) v;
 			}
 		});
 
@@ -202,6 +238,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mCalculationHistory.addLine(mResult);
 
 				} else {
+
 					if (mCurrentOperation == operationType.PLUS) {
 						mResult = mPreviousNumber + mCurrentNumber;
 					} else if (mCurrentOperation == operationType.MINUS) {
@@ -216,6 +253,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mPreviousNumber = mResult;
 					mPowerCount = 0;
 				}
+
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
 				mIsNew = true;
@@ -237,11 +275,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 			}
 		});
 
-		mNowTypingTextView = (TextView) v.findViewById(R.id.nowTypingTextView);
-		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
 
-		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
-		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
 //		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Koenigtype-reg.ttf");
 //		mHistoryTextView.setTypeface(tf);
 

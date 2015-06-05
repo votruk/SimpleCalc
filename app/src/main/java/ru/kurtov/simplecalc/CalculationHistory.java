@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.Enums.operationType;
 import ru.kurtov.simplecalc.Enums.specSymbol;
-import ru.kurtov.simplecalc.Enums.memoryOperations;
+import ru.kurtov.simplecalc.Enums.memoryOperation;
 
 
 public class CalculationHistory {
@@ -103,8 +103,17 @@ public class CalculationHistory {
 		isLastLineIncomplete = false;
 	}
 
-	public void addLine(double targetDouble, memoryOperations operation) {
+	public void addLine(double targetDouble, memoryOperation operation) {
+		String newLine = String.format("MEMORY %s %s",
+				mMyFormatter.getSymbolToString(operation),
+				mMyFormatter.formatDouble(targetDouble));
 
+		if (isLastLineIncomplete) {
+			int lastLineCount = mCalculations.size() - 1;
+			mCalculations.remove(lastLineCount);
+		}
+		mCalculations.add(newLine);
+		isLastLineIncomplete = false;
 	}
 
 	public String getCalculationHistory() {

@@ -6,21 +6,21 @@ import java.util.HashMap;
 import ru.kurtov.simplecalc.Enums.formatType;
 import ru.kurtov.simplecalc.Enums.operationType;
 import ru.kurtov.simplecalc.Enums.specSymbol;
-import ru.kurtov.simplecalc.Enums.memoryOperations;
+import ru.kurtov.simplecalc.Enums.memoryOperation;
 
 public class MyFormatter {
 //	private enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING};
 
 	private formatType mFormatType;
-	private HashMap<operationType, String> mOperationTypeHashMap;
+	private static HashMap<operationType, String> mOperationTypeHashMap;
 	private static HashMap<specSymbol, String> mSpecSymbolsHashMap;
+	private static HashMap<memoryOperation, String> mMemorySymbolsHashMap;
 
 	private static MyFormatter sMyFormatter;
 
 
 	private MyFormatter() {
 		mOperationTypeHashMap = new HashMap<operationType, String>();
-
 		mOperationTypeHashMap.put(operationType.DIVISION, Character.toString((char) 247));
 		mOperationTypeHashMap.put(operationType.MULTIPLY, Character.toString((char) 215));
 		mOperationTypeHashMap.put(operationType.PLUS, Character.toString((char) 43));
@@ -33,6 +33,12 @@ public class MyFormatter {
 		mSpecSymbolsHashMap.put(specSymbol.PLUS_MINUS, Character.toString((char) 177));
 		mSpecSymbolsHashMap.put(specSymbol.SQUARE, Character.toString((char) 8730));
 		mSpecSymbolsHashMap.put(specSymbol.EQUALS, Character.toString((char) 61));
+
+		mMemorySymbolsHashMap = new HashMap<memoryOperation, String>();
+		mMemorySymbolsHashMap.put(memoryOperation.ADD, Character.toString((char) 43));
+		mMemorySymbolsHashMap.put(memoryOperation.SUBTRACT, Character.toString((char) 8722));
+		mMemorySymbolsHashMap.put(memoryOperation.RECALL, Character.toString((char) 61));
+		mMemorySymbolsHashMap.put(memoryOperation.CLEAR, Character.toString((char) 61));
 	}
 
 	public static MyFormatter get() {
@@ -78,6 +84,10 @@ public class MyFormatter {
 
 	public String getSymbolToString(operationType type) {
 		return mOperationTypeHashMap.get(type);
+	}
+
+	public String getSymbolToString(memoryOperation operation) {
+		return mMemorySymbolsHashMap.get(operation);
 	}
 
 	public String getSymbolToString(specSymbol symbol) {
