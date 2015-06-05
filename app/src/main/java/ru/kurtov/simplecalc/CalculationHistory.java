@@ -4,8 +4,9 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
-import ru.kurtov.simplecalc.MainFragment.operationType;
-import ru.kurtov.simplecalc.MainFragment.specSymbol;
+import ru.kurtov.simplecalc.Enums.operationType;
+import ru.kurtov.simplecalc.Enums.specSymbol;
+import ru.kurtov.simplecalc.Enums.memoryOperations;
 
 
 public class CalculationHistory {
@@ -102,6 +103,10 @@ public class CalculationHistory {
 		isLastLineIncomplete = false;
 	}
 
+	public void addLine(double targetDouble, memoryOperations operation) {
+
+	}
+
 	public String getCalculationHistory() {
 		String allLines = "";
 		if (mCalculations.size() > 0) {
@@ -113,4 +118,5 @@ public class CalculationHistory {
 
 		return allLines;
 	}
+
 }

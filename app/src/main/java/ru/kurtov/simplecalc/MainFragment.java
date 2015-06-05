@@ -1,6 +1,5 @@
 package ru.kurtov.simplecalc;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,27 +10,26 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import ru.kurtov.simplecalc.Enums.formatType;
+import ru.kurtov.simplecalc.Enums.operationType;
+import ru.kurtov.simplecalc.Enums.specSymbol;
+import ru.kurtov.simplecalc.Enums.memoryOperations;
+
 
 public class MainFragment extends Fragment implements DigitClickable {
 
 	private double mCurrentNumber;
 	private double mPreviousNumber;
 	private int mPowerCount;
-	private int mPreviousPowerCount;
-	private float mBuffer;
+	private double mMemory;
 	private boolean mIsNew;
 	private boolean mIsDot;
 
-	private double mFirstOperand;
-	private double mSecondOperand;
 	private double mResult;
 
-	public enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING }
 	private operationType mCurrentOperation;
 	private operationType mPreviousOperation;
 
-	public enum formatType { NORMAL, TWO_DECIMALS, ONE_DECIMAL }
-	public enum specSymbol { SQUARE, PERCENT, PLUS_MINUS, BACKSPACE, EQUALS }
 	private formatType mFormatType;
 
 	private Button mSquareButton;
@@ -66,7 +64,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_main, container, false);
-		mFormatType = formatType.NORMAL;
+		mFormatType = Enums.formatType.NORMAL;
 		mMyFormatter = MyFormatter.get();
 		mMyFormatter.setFormatType(mFormatType);
 
@@ -134,8 +132,37 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 
 		mMemoryRecallClearButton = (Button) v.findViewById(R.id.memoryRecallClearButton);
+		mMemoryRecallClearButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (mActiveButton == v) {
+					mResult = 0;
+				} else {
+					mCurrentNumber = mMemory;
+					mIsNew = true;
+					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+					mActiveButton = (Button) v;
+				}
+			}
+		});
+
 		mMemoryAddButton = (Button) v.findViewById(R.id.memoryAddButton);
+		mMemoryAddButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mMemory = mMemory + mCurrentNumber;
+				mIsNew = true;
+			}
+		});
+
 		mMemorySubtractButton = (Button) v.findViewById(R.id.memorySubtractButton);
+		mMemorySubtractButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mMemory = mMemory - mCurrentNumber;
+				mIsNew = true;
+			}
+		});
 
 		mClearButton = (Button) v.findViewById(R.id.clearButton);
 		mClearButton.setOnClickListener(new View.OnClickListener() {
@@ -190,6 +217,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mPowerCount = 0;
 				}
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
+				mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
 				mIsNew = true;
 				mIsDot = false;
 
@@ -201,11 +229,17 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mDotButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (mIsNew) {
+					mNowTypingTextView.setText("0.");
+				}
 				mIsDot = true;
+				mIsNew = false;
 			}
 		});
 
 		mNowTypingTextView = (TextView) v.findViewById(R.id.nowTypingTextView);
+		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+
 		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
 		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
 //		Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Koenigtype-reg.ttf");
@@ -250,6 +284,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mPowerCount = 0;
 		mPreviousNumber = 0;
 		mCurrentNumber = 0;
+		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
 
 
 		mCurrentOperation = operationType.NOTHING;
@@ -278,13 +313,14 @@ public class MainFragment extends Fragment implements DigitClickable {
 							mResult = mPreviousNumber / mCurrentNumber;
 						}
 						mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
+						mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
+
 						mPreviousNumber = mResult;
 					}
 
 				}
 
 				mCurrentOperation = type;
-				mPreviousPowerCount = mPowerCount;
 
 				mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation);
 

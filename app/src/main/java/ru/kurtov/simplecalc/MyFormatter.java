@@ -3,9 +3,10 @@ package ru.kurtov.simplecalc;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-import ru.kurtov.simplecalc.MainFragment.operationType;
-import ru.kurtov.simplecalc.MainFragment.formatType;
-import ru.kurtov.simplecalc.MainFragment.specSymbol;
+import ru.kurtov.simplecalc.Enums.formatType;
+import ru.kurtov.simplecalc.Enums.operationType;
+import ru.kurtov.simplecalc.Enums.specSymbol;
+import ru.kurtov.simplecalc.Enums.memoryOperations;
 
 public class MyFormatter {
 //	private enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING};
@@ -78,6 +79,7 @@ public class MyFormatter {
 	public String getSymbolToString(operationType type) {
 		return mOperationTypeHashMap.get(type);
 	}
+
 	public String getSymbolToString(specSymbol symbol) {
 		return mSpecSymbolsHashMap.get(symbol);
 	}
