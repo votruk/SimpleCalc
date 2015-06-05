@@ -77,7 +77,7 @@
 		style="@style/TableRow">
 		<Button android:id="@+id/memoryRecallClearButton"
 			style="@style/ButtonSuperb"
-			android:text="MRC"/>
+			android:text="MR"/>
 		<Button android:id="@+id/memoryAddButton"
 			style="@style/ButtonSuperb"
 			android:text="M+"/>

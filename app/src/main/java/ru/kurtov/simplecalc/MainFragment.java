@@ -73,7 +73,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mFormatType = Enums.formatType.NORMAL;
 		mMyFormatter = MyFormatter.get();
 		mMyFormatter.setFormatType(mFormatType);
-		mStack = new ArrayList<Double>();
+		mStack = new ArrayList<>();
 
 		mCalculationHistory = CalculationHistory.get(getActivity());
 
@@ -162,6 +162,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mStack.remove(mStack.size() - 1);
 				} else {
 					mNowTypingTextView.setText("0");
+					mCurrentNumber = 0;
+					mPowerCount = 0;
 					mIsNew = true;
 				}
 			}
@@ -179,14 +181,18 @@ public class MainFragment extends Fragment implements DigitClickable {
 					String memoryString = String.format("MEMORY: %s",
 							mMyFormatter.formatDouble(mMemory));
 					mMemoryTextView.setText(memoryString);
+					mMemoryRecallClearButton.setText("MR");
 				} else {
 					mCurrentNumber = mMemory;
 					mIsNew = true;
 					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.RECALL);
+					mResult = mMemory;
+					mMemoryRecallClearButton.setText("MC");
 				}
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mActiveButton = (Button) v;
+				mCurrentOperation = operationType.NOTHING;
 
 			}
 		});
@@ -208,6 +214,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mIsNew = true;
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mActiveButton = (Button) v;
+				mMemoryRecallClearButton.setText("MR");
+
 
 			}
 		});
@@ -218,10 +226,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 			public void onClick(View v) {
 				if (mIsNew) {
 					mMemory = mMemory - mResult;
-					mCalculationHistory.addLine(mResult, memoryOperation.ADD);
+					mCalculationHistory.addLine(mResult, memoryOperation.SUBTRACT);
 				} else {
 					mMemory = mMemory - mCurrentNumber;
-					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.SUBTRACT);
 				}
 
 				String memoryString = String.format("MEMORY: %s",
@@ -229,9 +237,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mMemoryTextView.setText(memoryString);
 
 				mIsNew = true;
-				mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+//				mCalculationHistory.addLine(mCurrentNumber, memoryOperation.SUBTRACT);
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mActiveButton = (Button) v;
+				mMemoryRecallClearButton.setText("MR");
+
 			}
 		});
 
@@ -240,8 +250,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				clearAll();
-				mNowTypingTextView.setText("");
+//				mNowTypingTextView.setText("");
 				mActiveButton = (Button) v;
+				mMemoryRecallClearButton.setText("MR");
+
 			}
 		});
 
@@ -266,7 +278,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mEqualsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
+				if (mActiveButton != null) {
+					mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
+					mActiveButton = null;
+				}
 				if (mCurrentOperation == operationType.NOTHING) {
 					if (mCurrentNumber != 0 && mResult == 0) {
 						mResult = mCurrentNumber;
@@ -294,6 +309,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
 				mIsNew = true;
 				mIsDot = false;
+				mActiveButton = (Button) v;
+				mMemoryRecallClearButton.setText("MR");
 
 			}
 		});
@@ -308,6 +325,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 				}
 				mIsDot = true;
 				mIsNew = false;
+				mMemoryRecallClearButton.setText("MR");
+
 			}
 		});
 
@@ -319,6 +338,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 	}
 
 	public void digitClick(View view) {
+		mMemoryRecallClearButton.setText("MR");
 
 		Button currentDigit = (Button) view;
 		int digit = Integer.parseInt(currentDigit.getText().toString());
@@ -331,6 +351,13 @@ public class MainFragment extends Fragment implements DigitClickable {
 			if (mIsNew) {
 				mCurrentNumber = digit;
 				mStack.clear();
+				if (mActiveButton != null) {
+					if (mActiveButton == mEqualsButton) {
+						mCurrentOperation = operationType.NOTHING;
+					}
+					mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
+					mActiveButton = null;
+				}
 			} else {
 				mStack.add(mCurrentNumber);
 				mCurrentNumber = mCurrentNumber * 10 + digit;
@@ -340,7 +367,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mIsNew = false;
 
 		MyFormatter mf = MyFormatter.get();
-		String currentNumberString = "";
+		String currentNumberString;
 		if (mPowerCount > 0) {
 			currentNumberString = mf.formatDouble(mCurrentNumber, mPowerCount);
 		} else {
@@ -357,6 +384,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mPowerCount = 0;
 		mPreviousNumber = 0;
 		mCurrentNumber = 0;
+		mResult = 0;
 		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
 
 
@@ -368,7 +396,9 @@ public class MainFragment extends Fragment implements DigitClickable {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (!mIsNew) {
+				mMemoryRecallClearButton.setText("MR");
+
+				if (!mIsNew || mActiveButton == mMemoryRecallClearButton) {
 					if (mCurrentOperation == operationType.NOTHING) {
 						if (mCurrentNumber == 0 && mResult != 0) {
 							mPreviousNumber = mResult;
