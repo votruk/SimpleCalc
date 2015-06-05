@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import ru.kurtov.simplecalc.Enums.formatType;
 import ru.kurtov.simplecalc.Enums.operationType;
 import ru.kurtov.simplecalc.Enums.specSymbol;
@@ -24,6 +26,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private double mMemory;
 	private boolean mIsNew;
 	private boolean mIsDot;
+	private ArrayList<Double> mStack;
 
 	private double mResult;
 
@@ -67,6 +70,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mFormatType = Enums.formatType.NORMAL;
 		mMyFormatter = MyFormatter.get();
 		mMyFormatter.setFormatType(mFormatType);
+		mStack = new ArrayList<Double>();
 
 		mCalculationHistory = CalculationHistory.get(getActivity());
 
@@ -143,6 +147,19 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		mBackspaceButton = (Button) v.findViewById(R.id.backspaceButton);
 		mBackspaceButton.setText(mMyFormatter.getSymbolToString(specSymbol.BACKSPACE));
+		mBackspaceButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (!mStack.isEmpty()) {
+					mCurrentNumber = mStack.get(mStack.size() - 1);
+					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+					mStack.remove(mStack.size() - 1);
+				} else {
+					mNowTypingTextView.setText("0");
+					mIsNew = true;
+				}
+			}
+		});
 
 
 		mMemoryRecallClearButton = (Button) v.findViewById(R.id.memoryRecallClearButton);
@@ -289,11 +306,14 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 		if (mIsDot) {
 			mPowerCount++;
+			mStack.add(mCurrentNumber);
 			mCurrentNumber = mCurrentNumber + digit / (Math.pow(10, mPowerCount));
 		} else {
 			if (mIsNew) {
 				mCurrentNumber = digit;
+				mStack.clear();
 			} else {
+				mStack.add(mCurrentNumber);
 				mCurrentNumber = mCurrentNumber * 10 + digit;
 			}
 		}
