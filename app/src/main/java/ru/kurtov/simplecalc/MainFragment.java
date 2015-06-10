@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.Enums.formatType;
@@ -31,7 +32,6 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private double mResult;
 
 	private operationType mCurrentOperation;
-	private operationType mPreviousOperation;
 
 	private formatType mFormatType;
 
@@ -84,7 +84,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
 
 		mMemoryTextView = (TextView) v.findViewById(R.id.memoryTextView);
-		mMemoryTextView.setText("MEMORY: 0");
+		mMemoryTextView.setText("0");
 
 		clearAll();
 
@@ -178,8 +178,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mResult = 0;
 					mMemory = 0;
 					mCalculationHistory.addLine(mResult, memoryOperation.CLEAR);
-					String memoryString = String.format("MEMORY: %s",
-							mMyFormatter.formatDouble(mMemory));
+					String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
 					mMemoryTextView.setText(memoryString);
 					mMemoryRecallClearButton.setText("MR");
 				} else {
@@ -207,9 +206,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 				} else {
 					mMemory = mMemory + mCurrentNumber;
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
+					mResult = mCurrentNumber;
+
 				}
-				String memoryString = String.format("MEMORY: %s",
-						mMyFormatter.formatDouble(mMemory));
+				String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
 				mMemoryTextView.setText(memoryString);
 				mIsNew = true;
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
@@ -230,10 +230,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 				} else {
 					mMemory = mMemory - mCurrentNumber;
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.SUBTRACT);
+					mResult = mCurrentNumber;
 				}
 
-				String memoryString = String.format("MEMORY: %s",
-						mMyFormatter.formatDouble(mMemory));
+				String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
 				mMemoryTextView.setText(memoryString);
 
 				mIsNew = true;
@@ -241,6 +241,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mActiveButton = (Button) v;
 				mMemoryRecallClearButton.setText("MR");
+
 
 			}
 		});
@@ -343,6 +344,10 @@ public class MainFragment extends Fragment implements DigitClickable {
 		Button currentDigit = (Button) view;
 		int digit = Integer.parseInt(currentDigit.getText().toString());
 
+		BigDecimal bgDigit = new BigDecimal(currentDigit.getText().toString());
+		if (mCurrentNumber >= 1000000000) {
+			return;
+		}
 		if (mIsDot) {
 			mPowerCount++;
 			mStack.add(mCurrentNumber);

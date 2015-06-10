@@ -1,5 +1,7 @@
 package ru.kurtov.simplecalc;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
@@ -96,5 +98,36 @@ public class MyFormatter {
 
 	public void setFormatType(formatType type) {
 		mFormatType = type;
+	}
+
+//	private String addCommas(BigDecimal bigDecimal) {
+//		char[] chars = bigDecimal.toString().toCharArray();
+//		int buffer = 0;
+//		char[] newChars;
+//		int lengthOfNewChar = 0;
+//		if (bigDecimal.compareTo(BigDecimal.ZERO) < 0) {
+//			lengthOfNewChar = bigDecimal.toString().length();
+//		}
+//		int numberOfCommas = bigDecimal.divide(new BigDecimal("3"));
+//		for (int i = chars.length - 1; i >= 0; i--) {
+//			buffer++;
+//			if (buffer == 3 && i != 0) {
+//
+//			}
+//		}
+//		return "aaa";
+//	}
+
+	public static boolean isNumber(String s) {
+		if (s.length() == 0) return false;
+
+		char[] chars = s.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars[i];
+			if ((i != 0 && c == '-') || (!Character.isDigit(c) && c != '-')) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
