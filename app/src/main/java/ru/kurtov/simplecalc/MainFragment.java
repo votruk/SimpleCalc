@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.Enums.formatType;
@@ -21,17 +22,21 @@ import ru.kurtov.simplecalc.Enums.memoryOperation;
 
 public class MainFragment extends Fragment implements DigitClickable {
 
-	private double mCurrentNumber;
-	private double mPreviousNumber;
+	private BigDecimal mCurrentNumber;
+	private BigDecimal mPreviousNumber;
 	private int mPowerCount;
-	private double mMemory;
+	private BigDecimal mMemory;
 	private boolean mIsNew;
 	private boolean mIsDot;
-	private ArrayList<Double> mStack;
+	private ArrayList<BigDecimal> mStack;
 
-	private double mResult;
+	private BigDecimal mResult;
 
 	private operationType mCurrentOperation;
+
+	final static BigDecimal oneHundred = new BigDecimal("100");
+	final static BigDecimal maxNumber = new BigDecimal("999999999");
+
 
 	private formatType mFormatType;
 
@@ -65,7 +70,6 @@ public class MainFragment extends Fragment implements DigitClickable {
 	private MyFormatter mMyFormatter;
 
 
-
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,11 +78,16 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mMyFormatter = MyFormatter.get();
 		mMyFormatter.setFormatType(mFormatType);
 		mStack = new ArrayList<>();
+		mCurrentNumber = BigDecimal.ZERO;
+		mPreviousNumber = BigDecimal.ZERO;
+		mResult = BigDecimal.ZERO;
+		mMemory = BigDecimal.ZERO;
 
 		mCalculationHistory = CalculationHistory.get(getActivity());
 
 		mNowTypingTextView = (TextView) v.findViewById(R.id.nowTypingTextView);
-		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+//		mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mCurrentNumber));
+		updateNowTypingTextView(mCurrentNumber);
 
 		mHistoryTextView = (TextView) v.findViewById(R.id.historyTextView);
 		mHistoryTextView.setMovementMethod(new ScrollingMovementMethod());
@@ -94,11 +103,14 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mIsNew) {
-					mCurrentNumber = Math.sqrt(mResult);
+//					mCurrentNumber = Math.sqrt(mResult);
+					mCurrentNumber = sqrt(mResult);
 				} else {
-					mCurrentNumber = Math.sqrt(mCurrentNumber);
+//					mCurrentNumber = Math.sqrt(mCurrentNumber);
+					mCurrentNumber = sqrt(mCurrentNumber);
 				}
-				mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+//				mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mCurrentNumber));
+				updateNowTypingTextView(mCurrentNumber);
 				mPreviousNumber = mCurrentNumber;
 
 				mActiveButton = (Button) v;
@@ -112,19 +124,24 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mCurrentOperation == operationType.PLUS) {
-					mResult = mPreviousNumber * (1 + mCurrentNumber / 100);
+					mResult = mPreviousNumber.multiply((BigDecimal.ONE.add(mCurrentNumber.divide(oneHundred))));
+//					mResult = mPreviousNumber * (1 + mCurrentNumber / 100);
 				} else if (mCurrentOperation == operationType.MINUS) {
-					mResult = mPreviousNumber * (1 - mCurrentNumber / 100);
+					mResult = mPreviousNumber.multiply((BigDecimal.ONE.subtract(mCurrentNumber.divide(oneHundred))));
+//					mResult = mPreviousNumber * (1 - mCurrentNumber / 100);
 				} else if (mCurrentOperation == operationType.MULTIPLY || mCurrentOperation == operationType.DIVISION) {
-					mResult = (mPreviousNumber / 100) * mCurrentNumber;
+					mResult = mCurrentNumber.multiply(mPreviousNumber.divide(oneHundred));
+//					mResult = (mPreviousNumber / 100) * mCurrentNumber;
 				} else if (mCurrentOperation == operationType.NOTHING) {
-					mResult = mCurrentNumber / 100;
+					mResult = mCurrentNumber.divide(oneHundred);
+//					mResult = mCurrentNumber / 100;
 				}
 				mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult, specSymbol.PERCENT);
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
 				mPreviousNumber = mResult;
 				mCurrentOperation = operationType.NOTHING;
-				mCurrentNumber = 0;
+//				mCurrentNumber = 0;
+				mCurrentNumber = BigDecimal.ZERO;
 				mIsDot = false;
 				mIsNew = true;
 				mPowerCount = 0;
@@ -140,10 +157,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mChangeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mCurrentNumber = mCurrentNumber * (-1);
-				MyFormatter mf = MyFormatter.get();
-
-				mNowTypingTextView.setText(mf.formatDouble(mCurrentNumber, mPowerCount));
+//				mCurrentNumber = mCurrentNumber * (-1);
+				mCurrentNumber = mCurrentNumber.negate();
+//				MyFormatter mf = MyFormatter.get();
+//				mNowTypingTextView.setText(mf.formatBigDecimal(mCurrentNumber, mPowerCount));
+				updateNowTypingTextView(mCurrentNumber);
 
 				mActiveButton = (Button) v;
 
@@ -158,11 +176,12 @@ public class MainFragment extends Fragment implements DigitClickable {
 			public void onClick(View v) {
 				if (!mStack.isEmpty()) {
 					mCurrentNumber = mStack.get(mStack.size() - 1);
-					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+					mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mCurrentNumber));
 					mStack.remove(mStack.size() - 1);
 				} else {
 					mNowTypingTextView.setText("0");
-					mCurrentNumber = 0;
+//					mCurrentNumber = 0;
+					mCurrentNumber = BigDecimal.ZERO;
 					mPowerCount = 0;
 					mIsNew = true;
 				}
@@ -175,16 +194,18 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mActiveButton == v) {
-					mResult = 0;
-					mMemory = 0;
+//					mResult = 0;
+					mResult = BigDecimal.ZERO;
+//					mMemory = 0;
+					mMemory = BigDecimal.ZERO;
 					mCalculationHistory.addLine(mResult, memoryOperation.CLEAR);
-					String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
+					String memoryString = String.format("%s", mMyFormatter.formatBigDecimal(mMemory));
 					mMemoryTextView.setText(memoryString);
 					mMemoryRecallClearButton.setText("MR");
 				} else {
 					mCurrentNumber = mMemory;
 					mIsNew = true;
-					mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
+					mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mCurrentNumber));
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.RECALL);
 					mResult = mMemory;
 					mMemoryRecallClearButton.setText("MC");
@@ -201,15 +222,17 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mIsNew) {
-					mMemory = mMemory + mResult;
+//					mMemory = mMemory + mResult;
+					mMemory = mMemory.add(mResult);
 					mCalculationHistory.addLine(mResult, memoryOperation.ADD);
 				} else {
-					mMemory = mMemory + mCurrentNumber;
+//					mMemory = mMemory + mCurrentNumber;
+					mMemory = mMemory.add(mCurrentNumber);
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.ADD);
 					mResult = mCurrentNumber;
 
 				}
-				String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
+				String memoryString = String.format("%s", mMyFormatter.formatBigDecimal(mMemory));
 				mMemoryTextView.setText(memoryString);
 				mIsNew = true;
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
@@ -225,15 +248,17 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				if (mIsNew) {
-					mMemory = mMemory - mResult;
+//					mMemory = mMemory - mResult;
+					mMemory = mMemory.subtract(mResult);
 					mCalculationHistory.addLine(mResult, memoryOperation.SUBTRACT);
 				} else {
-					mMemory = mMemory - mCurrentNumber;
+//					mMemory = mMemory - mCurrentNumber;
+					mMemory = mMemory.subtract(mCurrentNumber);
 					mCalculationHistory.addLine(mCurrentNumber, memoryOperation.SUBTRACT);
 					mResult = mCurrentNumber;
 				}
 
-				String memoryString = String.format("%s", mMyFormatter.formatDouble(mMemory));
+				String memoryString = String.format("%s", mMyFormatter.formatBigDecimal(mMemory));
 				mMemoryTextView.setText(memoryString);
 
 				mIsNew = true;
@@ -251,7 +276,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 			@Override
 			public void onClick(View v) {
 				clearAll();
-//				mNowTypingTextView.setText("");
+				mNowTypingTextView.setText("");
 				mActiveButton = (Button) v;
 				mMemoryRecallClearButton.setText("MR");
 
@@ -284,21 +309,28 @@ public class MainFragment extends Fragment implements DigitClickable {
 					mActiveButton = null;
 				}
 				if (mCurrentOperation == operationType.NOTHING) {
-					if (mCurrentNumber != 0 && mResult == 0) {
+					if (!mCurrentNumber.equals(BigDecimal.ZERO) && mResult.equals(BigDecimal.ZERO)) {
 						mResult = mCurrentNumber;
 					}
+//					if (mCurrentNumber != 0 && mResult == 0) {
+//						mResult = mCurrentNumber;
+//					}
 					mCalculationHistory.addLine(mResult);
 
 				} else {
 
 					if (mCurrentOperation == operationType.PLUS) {
-						mResult = mPreviousNumber + mCurrentNumber;
+//						mResult = mPreviousNumber + mCurrentNumber;
+						mResult = mPreviousNumber.add(mCurrentNumber);
 					} else if (mCurrentOperation == operationType.MINUS) {
-						mResult = mPreviousNumber - mCurrentNumber;
+//						mResult = mPreviousNumber - mCurrentNumber;
+						mResult = mPreviousNumber.subtract(mCurrentNumber);
 					} else if (mCurrentOperation == operationType.MULTIPLY) {
-						mResult = mPreviousNumber * mCurrentNumber;
+//						mResult = mPreviousNumber * mCurrentNumber;
+						mResult = mPreviousNumber.multiply(mCurrentNumber);
 					} else if (mCurrentOperation == operationType.DIVISION) {
-						mResult = mPreviousNumber / mCurrentNumber;
+//						mResult = mPreviousNumber / mCurrentNumber;
+						mResult = mPreviousNumber.divide(mCurrentNumber, MathContext.DECIMAL64);
 					}
 
 					mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
@@ -307,7 +339,7 @@ public class MainFragment extends Fragment implements DigitClickable {
 				}
 
 				mHistoryTextView.setText(mCalculationHistory.getCalculationHistory());
-				mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
+				mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mResult));
 				mIsNew = true;
 				mIsDot = false;
 				mActiveButton = (Button) v;
@@ -321,8 +353,11 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mDotButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				String oldText = mNowTypingTextView.getText().toString();
 				if (mIsNew) {
 					mNowTypingTextView.setText("0.");
+				} else {
+					mNowTypingTextView.setText(oldText + ".");
 				}
 				mIsDot = true;
 				mIsNew = false;
@@ -342,56 +377,37 @@ public class MainFragment extends Fragment implements DigitClickable {
 		mMemoryRecallClearButton.setText("MR");
 
 		Button currentDigit = (Button) view;
-		int digit = Integer.parseInt(currentDigit.getText().toString());
+		String oldText = mNowTypingTextView.getText().toString();
+		String newDigit = currentDigit.getText().toString();
+		String newText = "";
 
-		BigDecimal bgDigit = new BigDecimal(currentDigit.getText().toString());
-		if (mCurrentNumber >= 1000000000) {
+		if (mCurrentNumber.compareTo(maxNumber) == 1) {
 			return;
 		}
-		if (mIsDot) {
-			mPowerCount++;
-			mStack.add(mCurrentNumber);
-			mCurrentNumber = mCurrentNumber + digit / (Math.pow(10, mPowerCount));
+
+		if (mIsNew) {
+			newText = newDigit;
 		} else {
-			if (mIsNew) {
-				mCurrentNumber = digit;
-				mStack.clear();
-				if (mActiveButton != null) {
-					if (mActiveButton == mEqualsButton) {
-						mCurrentOperation = operationType.NOTHING;
-					}
-					mActiveButton.setTextColor(getResources().getColor(R.color.defaultButtonTextColor));
-					mActiveButton = null;
-				}
-			} else {
-				mStack.add(mCurrentNumber);
-				mCurrentNumber = mCurrentNumber * 10 + digit;
-			}
+			newText = oldText + newDigit;
 		}
 
+		mNowTypingTextView.setText(newText);
+		mCurrentNumber = new BigDecimal(newText);
 		mIsNew = false;
-
-		MyFormatter mf = MyFormatter.get();
-		String currentNumberString;
-		if (mPowerCount > 0) {
-			currentNumberString = mf.formatDouble(mCurrentNumber, mPowerCount);
-		} else {
-			currentNumberString = mf.formatDouble(mCurrentNumber);
-		}
-
-		mNowTypingTextView.setText(currentNumberString);
-
 	}
 
 	private void clearAll() {
 		mIsNew = true;
 		mIsDot = false;
 		mPowerCount = 0;
-		mPreviousNumber = 0;
-		mCurrentNumber = 0;
-		mResult = 0;
-		mNowTypingTextView.setText(mMyFormatter.formatDouble(mCurrentNumber));
-
+//		mPreviousNumber = 0;
+		mPreviousNumber = BigDecimal.ZERO;
+//		mCurrentNumber = 0;
+		mPreviousNumber = BigDecimal.ZERO;
+//		mResult = 0;
+		mPreviousNumber = BigDecimal.ZERO;
+//		mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mCurrentNumber));
+		updateNowTypingTextView(mCurrentNumber);
 
 		mCurrentOperation = operationType.NOTHING;
 	}
@@ -405,23 +421,30 @@ public class MainFragment extends Fragment implements DigitClickable {
 
 				if (!mIsNew || mActiveButton == mMemoryRecallClearButton) {
 					if (mCurrentOperation == operationType.NOTHING) {
-						if (mCurrentNumber == 0 && mResult != 0) {
+
+						if (mCurrentNumber.equals(BigDecimal.ZERO) && !mResult.equals(BigDecimal.ZERO)) {
+//						if (mCurrentNumber == 0 && mResult != 0) {
 							mPreviousNumber = mResult;
 						} else {
 							mPreviousNumber = mCurrentNumber;
 						}
 					} else {
 						if (mCurrentOperation == operationType.PLUS) {
-							mResult = mPreviousNumber + mCurrentNumber;
+//							mResult = mPreviousNumber + mCurrentNumber;
+							mResult = mPreviousNumber.add(mCurrentNumber);
 						} else if (mCurrentOperation == operationType.MINUS) {
-							mResult = mPreviousNumber - mCurrentNumber;
+//							mResult = mPreviousNumber - mCurrentNumber;
+							mResult = mPreviousNumber.subtract(mCurrentNumber);
 						} else if (mCurrentOperation == operationType.MULTIPLY) {
-							mResult = mPreviousNumber * mCurrentNumber;
+//							mResult = mPreviousNumber * mCurrentNumber;
+							mResult = mPreviousNumber.multiply(mCurrentNumber);
 						} else if (mCurrentOperation == operationType.DIVISION) {
-							mResult = mPreviousNumber / mCurrentNumber;
+//							mResult = mPreviousNumber / mCurrentNumber;
+							mResult = mPreviousNumber.divide(mCurrentNumber);
 						}
 						mCalculationHistory.addLine(mPreviousNumber, mCurrentOperation, mCurrentNumber, mResult);
-						mNowTypingTextView.setText(mMyFormatter.formatDouble(mResult));
+//						mNowTypingTextView.setText(mMyFormatter.formatBigDecimal(mResult));
+						updateNowTypingTextView(mResult);
 
 						mPreviousNumber = mResult;
 					}
@@ -437,7 +460,8 @@ public class MainFragment extends Fragment implements DigitClickable {
 				mIsDot = false;
 				mIsNew = true;
 				mPowerCount = 0;
-				mResult = 0;
+//				mResult = 0;
+				mResult = BigDecimal.ZERO;
 
 				((Button) v).setTextColor(getResources().getColor(R.color.activeButtonTextColor));
 				if (mActiveButton != null && mActiveButton != v) {
@@ -447,4 +471,19 @@ public class MainFragment extends Fragment implements DigitClickable {
 			}
 		};
 	}
+
+	public static BigDecimal sqrt(BigDecimal value) {
+		BigDecimal x = new BigDecimal(Math.sqrt(value.doubleValue()));
+		return x.add(new BigDecimal(value.subtract(x.multiply(x)).doubleValue() / (x.doubleValue() * 2.0)));
+	}
+
+	private void updateNowTypingTextView(BigDecimal bd) {
+		String s = bd.stripTrailingZeros().toPlainString();
+		mNowTypingTextView.setText(s);
+	}
+	private void updateNowTypingTextView(BigDecimal bd, boolean cutZeroes) {
+		String s = bd.toPlainString();
+		mNowTypingTextView.setText(s);
+	}
+
 }

@@ -1,5 +1,6 @@
 package ru.kurtov.simplecalc;
 
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
@@ -11,8 +12,6 @@ import ru.kurtov.simplecalc.Enums.specSymbol;
 import ru.kurtov.simplecalc.Enums.memoryOperation;
 
 public class MyFormatter {
-//	private enum operationType {DIVISION, MULTIPLY, MINUS, PLUS, NOTHING};
-
 	private formatType mFormatType;
 	private static HashMap<operationType, String> mOperationTypeHashMap;
 	private static HashMap<specSymbol, String> mSpecSymbolsHashMap;
@@ -50,7 +49,7 @@ public class MyFormatter {
 		return sMyFormatter;
 	}
 
-	public String formatDouble(double d, int power) {
+	public String formatBigDecimal(double d, int power) {
 
 		if (power == 0) {
 			return String.format("%s", (long) d);
@@ -61,24 +60,61 @@ public class MyFormatter {
 
 	}
 
-	public String formatDouble(double d) {
+	public String formatBigDecimal(BigDecimal d, int power) {
+
+		if (power == 0) {
+			return String.format("%s", d.toPlainString());
+		} else {
+//			double newDouble = Math.round(d * Math.pow(10, power)) / (Math.pow(10, power) * 1.0);
+//			return String.format("%s", newDouble);
+			return String.format("%s", d.toPlainString());
+		}
+
+	}
+
+
+//	public String formatBigDecimal(double d) {
+//		String returnStatement = "";
+//		if (mFormatType == formatType.NORMAL) {
+//			if (d == (long) d) {
+//				returnStatement = String.format("%s", (long) d);
+//			} else {
+////				String newDouble = BigDecimal.valueOf(d).toString();
+////				returnStatement = String.format("%s", newDouble);
+//				DecimalFormat df = new DecimalFormat("#.#####");
+//				returnStatement = df.format(d);
+//			}
+//		} else if (mFormatType == formatType.ONE_DECIMAL) {
+//			DecimalFormat df = new DecimalFormat("#.#");
+//			returnStatement = df.format(d);
+//
+//		} else if (mFormatType == formatType.TWO_DECIMALS) {
+//			DecimalFormat df = new DecimalFormat("#.##");
+//			returnStatement = df.format(d);
+//		}
+//		return returnStatement;
+//
+//	}
+
+	public String formatBigDecimal(BigDecimal d) {
 		String returnStatement = "";
 		if (mFormatType == formatType.NORMAL) {
-			if (d == (long) d) {
-				returnStatement = String.format("%s", (long) d);
-			} else {
-//				String newDouble = BigDecimal.valueOf(d).toString();
-//				returnStatement = String.format("%s", newDouble);
-				DecimalFormat df = new DecimalFormat("#.#####");
-				returnStatement = df.format(d);
-			}
+			returnStatement = String.format("%s", d.toPlainString());
+//			if (d == (long) d) {
+//				returnStatement = String.format("%s", (long) d);
+//			} else {
+////				String newDouble = BigDecimal.valueOf(d).toString();
+////				returnStatement = String.format("%s", newDouble);
+//				DecimalFormat df = new DecimalFormat("#.#####");
+//				returnStatement = df.format(d);
+//			}
 		} else if (mFormatType == formatType.ONE_DECIMAL) {
 			DecimalFormat df = new DecimalFormat("#.#");
-			returnStatement = df.format(d);
+			returnStatement = df.format(d.doubleValue());
 
 		} else if (mFormatType == formatType.TWO_DECIMALS) {
 			DecimalFormat df = new DecimalFormat("#.##");
-			returnStatement = df.format(d);
+			returnStatement = df.format(d.doubleValue());
 		}
 		return returnStatement;
 
