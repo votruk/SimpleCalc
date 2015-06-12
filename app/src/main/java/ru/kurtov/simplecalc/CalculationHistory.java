@@ -2,7 +2,6 @@ package ru.kurtov.simplecalc;
 
 import android.content.Context;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import ru.kurtov.simplecalc.Enums.operationType;
@@ -39,12 +38,12 @@ public class CalculationHistory {
 
 
 
-	public void addLine(BigDecimal firstOperand, operationType type, BigDecimal secondOperand, BigDecimal result) {
+	public void addLine(double firstOperand, operationType type, double secondOperand, double result) {
 		String newLine = String.format("%s %s %s = %s",
-				mMyFormatter.formatBigDecimal(firstOperand),
+				mMyFormatter.formatDouble(firstOperand),
 				mMyFormatter.getSymbolToString(type),
-				mMyFormatter.formatBigDecimal(secondOperand),
-				mMyFormatter.formatBigDecimal(result));
+				mMyFormatter.formatDouble(secondOperand),
+				mMyFormatter.formatDouble(result));
 
 		if (isLastLineIncomplete) {
 			int lastLineCount = mCalculations.size() - 1;
@@ -54,9 +53,9 @@ public class CalculationHistory {
 		isLastLineIncomplete = false;
 	}
 
-	public void addLine(BigDecimal firstOperand, operationType type) {
+	public void addLine(double firstOperand, operationType type) {
 		String newLine = String.format("%s %s",
-				mMyFormatter.formatBigDecimal(firstOperand),
+				mMyFormatter.formatDouble(firstOperand),
 				mMyFormatter.getSymbolToString(type));
 		if (isLastLineIncomplete) {
 			int lastLineCount = mCalculations.size() - 1;
@@ -66,24 +65,24 @@ public class CalculationHistory {
 		isLastLineIncomplete = true;
 	}
 
-	public void addLine(BigDecimal firstOperand, operationType type, BigDecimal secondOperand, BigDecimal result, specSymbol symbol) {
+	public void addLine(double firstOperand, operationType type, double secondOperand, double result, specSymbol symbol) {
 		String newLine = "";
 		if (symbol == specSymbol.PERCENT) {
 			if (type == operationType.PLUS || type == operationType.MINUS) {
 				newLine = String.format("%s %s %s%% = %s",
-						mMyFormatter.formatBigDecimal(firstOperand),
+						mMyFormatter.formatDouble(firstOperand),
 						mMyFormatter.getSymbolToString(type),
-						mMyFormatter.formatBigDecimal(secondOperand),
-						mMyFormatter.formatBigDecimal(result));
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
 			} else if (type == operationType.MULTIPLY || type == operationType.DIVISION) {
 				newLine = String.format("%s%% from %s = %s",
-						mMyFormatter.formatBigDecimal(firstOperand),
-						mMyFormatter.formatBigDecimal(secondOperand),
-						mMyFormatter.formatBigDecimal(result));
+						mMyFormatter.formatDouble(firstOperand),
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
 			} else if (type == operationType.NOTHING) {
 				newLine = String.format("%s%% = %s",
-						mMyFormatter.formatBigDecimal(secondOperand),
-						mMyFormatter.formatBigDecimal(result));
+						mMyFormatter.formatDouble(secondOperand),
+						mMyFormatter.formatDouble(result));
 			}
 		}
 
@@ -95,19 +94,19 @@ public class CalculationHistory {
 		isLastLineIncomplete = false;
 	}
 
-	public void addLine(BigDecimal onlyOneOperand) {
+	public void addLine(double onlyOneOperand) {
 		String newLine = String.format("%s = %s",
-				mMyFormatter.formatBigDecimal(onlyOneOperand),
-				mMyFormatter.formatBigDecimal(onlyOneOperand));
+				mMyFormatter.formatDouble(onlyOneOperand),
+				mMyFormatter.formatDouble(onlyOneOperand));
 
 		mCalculations.add(newLine);
 		isLastLineIncomplete = false;
 	}
 
-	public void addLine(BigDecimal targetDouble, memoryOperation operation) {
+	public void addLine(double targetDouble, memoryOperation operation) {
 		String newLine = String.format("MEMORY %s %s",
 				mMyFormatter.getSymbolToString(operation),
-				mMyFormatter.formatBigDecimal(targetDouble));
+				mMyFormatter.formatDouble(targetDouble));
 
 		if (isLastLineIncomplete) {
 			int lastLineCount = mCalculations.size() - 1;
